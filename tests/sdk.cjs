@@ -1,0 +1,27 @@
+const {test}=require('node:test'),assert=require('node:assert/strict');
+const {WebSocketServer}=require('../com.astakhoff.mac-health.sdPlugin/node_modules/ws');
+const {spawn}=require('node:child_process');
+const {once}=require('node:events');
+const fs=require('node:fs/promises'),path=require('node:path'),os=require('node:os');
+test('official SDK receives all three actions and displays native helper measurements', {skip:process.platform!=='darwin',timeout:15000},async t=>{
+ const temp=await fs.mkdtemp(path.join(os.tmpdir(),'mac-health-sdk-'));
+ const server=new WebSocketServer({host:'127.0.0.1',port:0});await once(server,'listening');let child;
+ t.after(async()=>{child?.kill();for(const socket of server.clients)socket.terminate();await new Promise(r=>server.close(r));await fs.rm(temp,{recursive:true,force:true});});
+ const connected=once(server,'connection');
+ const info={application:{version:'7.4.2',language:'en',platform:'mac',platformVersion:'13',font:'Arial'},plugin:{uuid:'com.astakhoff.mac-health',version:'1.0.0.0'},devices:[{id:'device',type:2,name:'Stream Deck XL',size:{columns:8,rows:4}}],devicePixelRatio:1};
+ child=spawn(process.execPath,[path.resolve(__dirname,'../com.astakhoff.mac-health.sdPlugin/bin/plugin.mjs'),'-port',String(server.address().port),'-pluginUUID','test-plugin','-registerEvent','registerPlugin','-info',JSON.stringify(info)],{cwd:temp,stdio:'ignore'});
+ const messages=[];const[socket]=await connected;socket.on('message',b=>messages.push(JSON.parse(b)));
+ const waitFor=async fn=>{for(let i=0;i<500;i++){const hit=messages.find(fn);if(hit)return hit;await new Promise(r=>setTimeout(r,10));}throw new Error('SDK measurement not received');};
+ await waitFor(m=>m.event==='registerPlugin');
+ const emit=(event,kind,payload={})=>socket.send(JSON.stringify({event,action:'com.astakhoff.mac-health.'+kind,context:kind,device:'device',payload:{controller:'Keypad',coordinates:{row:0,column:0},settings:{},...payload}}));
+ for(const kind of ['memory','cpu','disk'])emit('willAppear',kind);
+ const contains=(m,kind,text)=>m.event==='setImage'&&m.context===kind&&Buffer.from(m.payload.image.split(',')[1],'base64').toString().includes(text);
+ await waitFor(m=>contains(m,'memory','%<'));
+ await waitFor(m=>contains(m,'cpu','%<'));
+ await waitFor(m=>contains(m,'disk','%<'));
+ emit('propertyInspectorDidAppear','memory');
+ const detail=await waitFor(m=>m.event==='sendToPropertyInspector'&&m.context==='memory'&&m.payload.sample?.memory);
+ assert.ok(detail.payload.sample.memory.total>0);assert.ok(detail.payload.sample.memory.used>=0);
+ for(const kind of ['memory','cpu','disk'])emit('willDisappear',kind);
+ assert.equal(messages.filter(m=>m.event==='registerPlugin').length,1);
+});

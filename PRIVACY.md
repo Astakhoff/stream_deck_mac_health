@@ -2,7 +2,7 @@
 
 Mac Health reads aggregate CPU and virtual-memory counters, physical RAM size, coarse memory pressure, swap allocation, and capacity of the macOS startup data volume. This information is used only to display three local Stream Deck keys and their settings diagnostics.
 
-The plugin does not make network requests or use a developer server. It does not read credentials, Keychain items, documents, browsing history, process lists, application names, or per-process metrics. No telemetry or resource-history database is created. Stream Deck stores per-key display preferences and manages its own logs and settings. The official SDK may write operational logs locally.
+The plugin makes no Internet requests and uses no developer server. It communicates with the local Stream Deck application over a loopback WebSocket. It does not read credentials, Keychain items, documents, browsing history, process lists, application names, or per-process metrics. No telemetry or resource-history database is created. Stream Deck stores per-key display preferences and manages its own logs and settings. The official SDK may write operational logs locally.
 
 The native sampler stops when no Mac Health action is visible. Removing the plugin stops monitoring. No separate service, account, or login item is installed. The plugin never quits applications or changes system settings automatically.
 
