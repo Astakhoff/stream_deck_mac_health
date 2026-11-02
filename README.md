@@ -12,10 +12,10 @@ The keys help you notice resource pressure while working with many applications.
 | --- | --- | --- | --- |
 | Memory | Estimated physical RAM used | macOS coarse memory-pressure level | Schematic 5-minute swap trend |
 | CPU | Average total CPU usage over up to 10 seconds | Configurable CPU thresholds | Schematic 5-minute load trend |
-| Disk | Used startup data-volume capacity | Configurable available-space thresholds | Available space in GiB |
+| Disk | Used or remaining percentage; bar always shows used capacity | Configurable available-space thresholds | Used or remaining GiB |
 | Backup | Time since last known completed Time Machine backup | Age: green <7d, yellow 7–29d, red ≥30d | ago |
 
-Status words are hidden on keys: the title and bar use fixed green (normal), yellow (warning), and red (critical). Memory and CPU use the lower area for schematic rolling 5-minute graphs, without axes, scales, legends, or extra numbers. Disk retains its large available-space amount. Status text remains in action settings; unavailable readings stay explicitly marked. Each action has its own thresholds where applicable. All visible actions share one small native sampler, which reads system counters every **2 seconds**. Sampling stops when no Mac Health action is visible. Press Memory or CPU to open Activity Monitor; press Disk to open Disk Utility.
+Status words are hidden on keys: the title and bar use fixed green (normal), yellow (warning), and red (critical). Memory and CPU use the lower area for schematic rolling 5-minute graphs, without axes, scales, legends, or extra numbers. Disk shows a large capacity amount matching the selected Used / Remaining mode, without a Free space caption. Status text remains in action settings; unavailable readings stay explicitly marked. Each action has its own thresholds where applicable. All visible actions share one small native sampler, which reads system counters every **2 seconds**. Sampling stops when no Mac Health action is visible. Press Memory or CPU to open Activity Monitor; press Disk to toggle **Used / Remaining**; the selected mode is saved per key.
 
 ### Memory
 
@@ -33,7 +33,7 @@ Defaults: **Warning at 80%**, **Critical at 95%**. Brief spikes are averaged; co
 
 ### Disk
 
-Disk reads available capacity on `/System/Volumes/Data`. Defaults:
+Disk reads capacity on `/System/Volumes/Data`. Press to toggle between used percentage + used GiB and remaining percentage + available GiB. The bar always shows used capacity in either mode. The selected mode is saved per key and can also be changed in settings. Existing keys start in Used mode; the first press shows Remaining. Color always follows available-space thresholds. Defaults:
 
 - Warning: **10% or less free**, or **20 GiB or less available**.
 - Critical: **5% or less free**, or **10 GiB or less available**.

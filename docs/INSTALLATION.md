@@ -10,15 +10,15 @@
 
 The keys are independent. They do not alternate between metrics and there is no combined key. Add them to any existing page, or create a separate page for Mac Health.
 
-Colors are fixed: green means normal, yellow warning, and red critical. These words appear only in the settings panel; Memory and CPU use that space for schematic 5-minute trend lines; Disk shows larger free-space details. CPU has configurable usage thresholds; Disk has configurable available-space percentage and GiB thresholds. Memory uses macOS pressure status rather than configurable occupied-RAM thresholds.
+Colors are fixed: green means normal, yellow warning, and red critical. These words appear only in the settings panel; Memory and CPU use that space for schematic 5-minute trend lines; Disk shows a larger capacity amount matching its Used / Remaining mode. CPU has configurable usage thresholds; Disk has configurable available-space percentage and GiB thresholds. Memory uses macOS pressure status rather than configurable occupied-RAM thresholds.
 
 ## Reading the keys
 
 - **Memory:** occupied-RAM estimate and a schematic swap-allocation trend for the last 5 minutes. High occupied RAM or swap alone does not necessarily imply critical pressure. Yellow/red pressure is a reason to inspect your workload in Activity Monitor.
 - **CPU:** overall usage, averaged over up to 10 seconds. The first reading needs a second counter sample, so CPU initially says Sampling. The lower line graph shows raw load over the last 5 minutes. Color also reflects macOS thermal pressure, not a temperature in degrees.
-- **Disk:** percentage used and available GiB on the startup data volume. Freeing disk space and closing applications are your own actions; the plugin never does either automatically.
+- **Disk:** used or remaining percentage and matching GiB on the startup data volume. Press to toggle; the bar always shows used capacity and the color always follows free-space thresholds. Freeing disk space and closing applications are your own actions; the plugin never does either automatically.
 
-Press Memory or CPU to open Activity Monitor. Press Disk to open Disk Utility. These launches only occur when you press a key.
+Press Memory or CPU to open Activity Monitor. Press Disk to toggle **Used / Remaining**; the selected mode is saved per key. These launches only occur when you press a key.
 
 ## Time Machine backup age
 

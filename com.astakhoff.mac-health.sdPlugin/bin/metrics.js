@@ -3,7 +3,7 @@ const GIB = 1024 ** 3;
 const finite = (n) => typeof n === 'number' && Number.isFinite(n);
 const defaults = {cpuWarning:80,cpuCritical:95,diskWarning:10,diskCritical:5,diskWarningGiB:20,diskCriticalGiB:10};
 function settings(raw={}) {
-  const s={...defaults};
+  const s={...defaults,diskMode:raw.diskMode==='remaining'?'remaining':'used'};
   for(const key of ['cpuWarning','cpuCritical','diskWarning','diskCritical','diskWarningGiB','diskCriticalGiB']) if(raw[key]!==undefined && Number.isFinite(Number(raw[key]))) s[key]=Number(raw[key]);
   if(!(s.cpuWarning>=1 && s.cpuWarning<s.cpuCritical && s.cpuCritical<=100)) {s.cpuWarning=80;s.cpuCritical=95;}
   if(!(s.diskCritical>=0 && s.diskCritical<s.diskWarning && s.diskWarning<=100)) {s.diskWarning=10;s.diskCritical=5;}
@@ -57,6 +57,7 @@ function view(kind,data,config={},error=null,now=Date.now()) {
   const level=classify(kind,data,config), label={normal:'Normal',warning:'Warning',critical:'Critical',unknown:'Unknown'}[level];
   if(kind==='memory') return {title:'Memory',main:data.memory?Math.round(data.memory.percent)+'%':'—',label,detail:data.memory?.swap!==null&&data.memory? 'Swap '+gib(data.memory.swap):'Swap unknown',graph:{points:data.history?.swap||[],windowEnd:data.timestamp,minSpan:256*1024**2},percent:data.memory?.percent??null,level};
   if(kind==='cpu') return {title:'CPU',main:finite(data.cpuAverage)?Math.round(data.cpuAverage)+'%':'—',label:finite(data.cpuAverage)?label:'Sampling',detail:finite(data.cpuAverage)?'CPU load history':'First sample…',graph:{points:data.history?.cpu||[],windowEnd:data.timestamp,min:0,max:100},percent:data.cpuAverage,level};
-  return {title:'Disk',main:data.disk?Math.round(data.disk.percent)+'%':'—',label,detail:data.disk?gib(data.disk.available)+' free':'No disk data',detailLabel:'Free space',detailValue:data.disk?gib(data.disk.available):'Unknown',percent:data.disk?.percent??null,level};
+  const remaining=settings(config).diskMode==='remaining';
+  return {title:'Disk',main:data.disk?Math.round(remaining?data.disk.freePercent:data.disk.percent)+'%':'—',label,detail:data.disk?gib(remaining?data.disk.available:data.disk.total-data.disk.available):'No disk data',percent:data.disk?.percent??null,level,diskMode:remaining?'remaining':'used'};
 }
 module.exports={GIB,defaults,settings,normalize,createAverage,classify,view,gib};

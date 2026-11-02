@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.0 — 2026-11-02
+
+- Press Disk to toggle saved Used / Remaining percentage and matching GiB.
+- Keep the bar tied to used capacity and color tied to available-space thresholds in both modes.
+- Remove the Free space caption and enlarge the capacity amount.
+
 ## 1.3.0 — 2026-11-02
 
 - Add a separate Time Machine Backup action with a large elapsed age and an ago footer.
