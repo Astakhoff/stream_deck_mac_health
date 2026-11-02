@@ -1,0 +1,14 @@
+{
+  "name": "stream-deck-mac-health",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "setup": "npm ci --omit=dev --prefix com.astakhoff.mac-health.sdPlugin",
+    "build:native": "node scripts/build-native.mjs",
+    "test": "node --test tests/*.cjs",
+    "validate": "streamdeck validate com.astakhoff.mac-health.sdPlugin",
+    "pack": "node scripts/package.mjs"
+  },
+  "devDependencies": { "@elgato/cli": "1.10.4" }
+}

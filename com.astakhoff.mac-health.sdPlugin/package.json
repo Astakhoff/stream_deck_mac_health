@@ -1,0 +1,9 @@
+{
+  "name": "mac-health",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "license": "MIT",
+  "dependencies": { "@elgato/streamdeck": "2.1.2" },
+  "overrides": { "zod": "4.6.6" }
+}

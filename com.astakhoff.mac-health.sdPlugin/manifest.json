@@ -1,0 +1,76 @@
+{
+  "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
+  "UUID": "com.astakhoff.mac-health",
+  "Name": "Mac Health",
+  "Version": "1.0.0.0",
+  "Author": "Astakhoff",
+  "Description": "Separate memory pressure, CPU load, and disk-space indicators for macOS.",
+  "Category": "Mac Health",
+  "CategoryIcon": "imgs/category",
+  "Icon": "imgs/plugin",
+  "CodePath": "bin/plugin.mjs",
+  "OS": [
+    {
+      "Platform": "mac",
+      "MinimumVersion": "13"
+    }
+  ],
+  "Software": {
+    "MinimumVersion": "6.9"
+  },
+  "SDKVersion": 3,
+  "Nodejs": {
+    "Version": "20"
+  },
+  "URL": "https://github.com/Astakhoff/stream_deck_mac_health",
+  "Actions": [
+    {
+      "UUID": "com.astakhoff.mac-health.memory",
+      "Name": "Memory",
+      "Icon": "imgs/memory-action",
+      "Controllers": [
+        "Keypad"
+      ],
+      "Tooltip": "RAM usage estimate, macOS memory pressure, and swap used. Press to open Activity Monitor.",
+      "PropertyInspectorPath": "ui/settings.html",
+      "States": [
+        {
+          "Image": "imgs/memory-key",
+          "ShowTitle": false
+        }
+      ]
+    },
+    {
+      "UUID": "com.astakhoff.mac-health.cpu",
+      "Name": "CPU",
+      "Icon": "imgs/cpu-action",
+      "Controllers": [
+        "Keypad"
+      ],
+      "Tooltip": "Total CPU load averaged over up to 10 seconds. Press to open Activity Monitor.",
+      "PropertyInspectorPath": "ui/settings.html",
+      "States": [
+        {
+          "Image": "imgs/cpu-key",
+          "ShowTitle": false
+        }
+      ]
+    },
+    {
+      "UUID": "com.astakhoff.mac-health.disk",
+      "Name": "Disk",
+      "Icon": "imgs/disk-action",
+      "Controllers": [
+        "Keypad"
+      ],
+      "Tooltip": "Startup data-volume space used and available GiB. Press to open Disk Utility.",
+      "PropertyInspectorPath": "ui/settings.html",
+      "States": [
+        {
+          "Image": "imgs/disk-key",
+          "ShowTitle": false
+        }
+      ]
+    }
+  ]
+}

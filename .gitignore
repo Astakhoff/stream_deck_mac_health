@@ -1,0 +1,8 @@
+node_modules/
+dist/
+work/
+*.log
+.DS_Store
+com.astakhoff.mac-health.sdPlugin/bin/mac-health
+*.streamDeckPlugin
+*.zip
