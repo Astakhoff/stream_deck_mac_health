@@ -54,9 +54,9 @@ Graphs retain a rolling 5-minute window of measurements, capped at 151 samples p
 
 Requirements: **macOS 13+**, **Stream Deck 6.9+**, and a Stream Deck keypad or compatible virtual keys. Apple Silicon and Intel are included in the same native helper. Users installing a packaged build do not need Node.js or Xcode separately; Stream Deck provides its Node runtime.
 
-For a packaged build, double-click `com.astakhoff.mac-health.streamDeckPlugin`, then find **Mac Health** in the action list. Drag the desired actions onto separate keys, including **Backup** for Time Machine. See [installation and troubleshooting](docs/INSTALLATION.md).
+Download the installer from [GitHub Releases](https://github.com/Astakhoff/stream_deck_mac_health/releases/latest). For a packaged build, double-click `com.astakhoff.mac-health.streamDeckPlugin`, then find **Mac Health** in the action list. Drag the desired actions onto separate keys, including **Backup** for Time Machine. See [installation and troubleshooting](docs/INSTALLATION.md).
 
-This project is for direct/internal use. It has **not been submitted to Elgato Marketplace**. No store publication is automated.
+Public source and packaged builds are distributed through GitHub. This project has **not been submitted to Elgato Marketplace**. No store publication is automated.
 
 ## Build from source
 

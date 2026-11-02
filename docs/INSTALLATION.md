@@ -4,7 +4,7 @@
 
 1. Install Stream Deck from the [official Elgato downloads page](https://www.elgato.com/downloads).
 2. Use macOS 13 or later and Stream Deck 6.9 or later.
-3. Double-click the supplied `com.astakhoff.mac-health.streamDeckPlugin` installer.
+3. Download the installer from [GitHub Releases](https://github.com/Astakhoff/stream_deck_mac_health/releases/latest), then double-click the supplied `com.astakhoff.mac-health.streamDeckPlugin` installer.
 4. Search the actions list for **Mac Health**.
 5. Drag **Memory** onto one key, **CPU** onto another, optionally **Disk** onto a third, and **Backup** onto a fourth.
 
