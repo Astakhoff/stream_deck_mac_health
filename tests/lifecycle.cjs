@@ -12,6 +12,8 @@ test('helper handles chunked lines, invalid samples, retry, and cancellation',()
  children[0].emit('close');assert.equal(pending[0].ms,2000);pending[0].fn();assert.equal(children.length,2);
  m.stop();assert.ok(children[1].killed);assert.equal(m.sample,null);
  children[1].emit('close');assert.equal(pending.length,1);
+ m.start();children[2].stdout.emit('data',Buffer.from('{"timestamp":14000,"cpu":35}\n'));
+ assert.equal(m.sample.history.cpu.length,2);assert.equal(m.sample.cpuAverage,35);m.stop();
 });
 test('three separate actions share sampling; per-key thresholds and opening behavior stay independent',async()=>{
  const callbacks={},pictures={},opened=[];

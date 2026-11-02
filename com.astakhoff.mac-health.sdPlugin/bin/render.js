@@ -1,10 +1,13 @@
 'use strict';
+const {renderGraph}=require('./graph');
 const palette={normal:'#55e58c',warning:'#ffd45c',critical:'#ff6b70',unknown:'#91a1b9'};
 const escape=(s)=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 function render(v,raw={}) {
   const color=palette[v.level]||palette.unknown;
   const bottom=v.level==='unknown'
     ? `<text x="72" y="113" font-size="16" fill="${color}">${escape(v.label)}</text><text x="72" y="137" font-size="17" fill="#c5cfdf">${escape(v.detail)}</text>`
+    : v.graph
+      ? renderGraph(v.graph,color)
     : v.detailLabel
       ? `<text x="72" y="113" font-size="15" fill="#aab9d0">${escape(v.detailLabel)}</text><text x="72" y="138" font-size="26" fill="#f3f8ff">${escape(v.detailValue)}</text>`
       : `<text x="72" y="130" font-size="25" fill="#f3f8ff">${escape(v.detail)}</text>`;

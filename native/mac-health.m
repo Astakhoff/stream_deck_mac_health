@@ -1,3 +1,4 @@
+#import <Foundation/Foundation.h>
 #include <mach/mach.h>
 #include <mach/mach_host.h>
 #include <mach/vm_statistics.h>
@@ -61,6 +62,7 @@ static void sample(void) {
     gettimeofday(&wall, NULL);
     printf("{\"timestamp\":%.0f,\"cpu\":", (double)wall.tv_sec * 1000.0 + wall.tv_usec / 1000.0);
     if (usage >= 0) printf("%.3f", usage); else printf("null");
+    printf(",\"thermal\":%ld", (long)NSProcessInfo.processInfo.thermalState);
     printf(",\"memory\":{\"valid\":%s,\"total\":%llu,\"used\":%llu,\"compressed\":%llu,\"pressure\":%d,\"swap\":", vm_ok && physical_ok && physical ? "true" : "false", (unsigned long long)physical, (unsigned long long)used, (unsigned long long)compressed, pressure);
     if (swap_ok) printf("%llu", (unsigned long long)swap.xsu_used); else printf("null");
     printf("},\"disk\":{\"valid\":%s,\"total\":%llu,\"available\":%llu}}\n", disk_ok ? "true" : "false", disk_ok ? (unsigned long long)disk.f_blocks * disk.f_bsize : 0, disk_ok ? (unsigned long long)disk.f_bavail * disk.f_bsize : 0);
@@ -74,7 +76,7 @@ int main(int argc, char **argv) {
     } else if (argc != 1) return 2;
     signal(SIGTERM, stop); signal(SIGINT, stop); signal(SIGPIPE, stop);
     while (running) {
-        sample();
+        @autoreleasepool { sample(); }
         if (remaining > 0 && --remaining == 0) break;
         sleep(2);
     }

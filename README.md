@@ -10,25 +10,25 @@ The keys help you notice resource pressure while working with many applications.
 
 | Key | Large number and bar | Status color | Bottom line |
 | --- | --- | --- | --- |
-| Memory | Estimated physical RAM used | macOS coarse memory-pressure level | Swap currently allocated |
-| CPU | Average total CPU usage over up to 10 seconds | Configurable CPU thresholds | Actual averaging window |
+| Memory | Estimated physical RAM used | macOS coarse memory-pressure level | Schematic 5-minute swap trend |
+| CPU | Average total CPU usage over up to 10 seconds | Configurable CPU thresholds | Schematic 5-minute load trend |
 | Disk | Used startup data-volume capacity | Configurable available-space thresholds | Available space in GiB |
 
-Status words are hidden on keys: the title and bar use fixed green (normal), yellow (warning), and red (critical). Swap and free-space amounts use the enlarged lower area. Status text remains in action settings; unavailable readings stay explicitly marked. Each action has its own thresholds where applicable. All visible actions share one small native sampler, which reads system counters every **2 seconds**. Sampling stops when no Mac Health action is visible. Press Memory or CPU to open Activity Monitor; press Disk to open Disk Utility.
+Status words are hidden on keys: the title and bar use fixed green (normal), yellow (warning), and red (critical). Memory and CPU use the lower area for schematic rolling 5-minute graphs, without axes, scales, legends, or extra numbers. Disk retains its large available-space amount. Status text remains in action settings; unavailable readings stay explicitly marked. Each action has its own thresholds where applicable. All visible actions share one small native sampler, which reads system counters every **2 seconds**. Sampling stops when no Mac Health action is visible. Press Memory or CPU to open Activity Monitor; press Disk to open Disk Utility.
 
 ### Memory
 
 The percentage estimates physical memory used by anonymous pages, wired pages, and the physical compressor, subtracting purgeable anonymous pages. Reclaimable file cache is excluded. This is an estimate and may differ from Activity Monitor's Memory Used figure.
 
-Color follows the system's coarse pressure level: **Normal** (green), **Warning** (yellow), or **Critical** (red). It is not a reproduction of Activity Monitor's pressure graph. A large swap allocation alone does not make the key red: swap can remain allocated after a busy period. Compressed memory, RAM capacity, swap, and the raw pressure level are shown in the settings panel.
+Color follows the system's coarse pressure level: **Normal** (green), **Warning** (yellow), or **Critical** (red). It is not a reproduction of Activity Monitor's pressure graph. A large swap allocation alone does not make the key red: swap can remain allocated after a busy period. The Memory line shows swap allocation over the most recent 5 minutes: a flat line means stable allocation; a rising line means increasing allocation. It does not measure swap I/O activity. The vertical range adapts to observed values with a minimum span of 256 MiB, so the trace shows relative direction, not absolute severity. Compressed memory, RAM capacity, swap, and the raw pressure level are shown in the settings panel.
 
 Apple explains why memory pressure is more useful than treating occupied RAM as a problem: [Check if your Mac needs more RAM](https://support.apple.com/guide/activity-monitor/actmntr34865/mac).
 
 ### CPU
 
-CPU usage is calculated from changes in system-wide Mach CPU ticks. **100% means the entire logical CPU capacity is busy**, unlike Activity Monitor's per-process percentages, which can exceed 100%. The key smooths up to five 2-second samples. During startup it shows the shorter actual window; after a long sampling gap it starts a new window.
+CPU usage is calculated from changes in system-wide Mach CPU ticks. **100% means the entire logical CPU capacity is busy**, unlike Activity Monitor's per-process percentages, which can exceed 100%. The main number smooths up to five 2-second samples. The lower trace shows raw 2-second load samples over the most recent 5 minutes, with a fixed 0–100% vertical range and no printed scale. The averaging window is shown only in settings; after a long sampling gap it starts a new window.
 
-Defaults: **Warning at 80%**, **Critical at 95%**. Brief spikes are averaged; this is not a temperature, thermal throttling, or GPU monitor.
+Defaults: **Warning at 80%**, **Critical at 95%**. Brief spikes are averaged; color also incorporates the system thermal state reported by Apple’s `NSProcessInfo.thermalState` API: fair is yellow, serious/critical are red. This describes overall device thermal conditions, not a Celsius temperature or a direct CPU-only sensor measurement. Missing thermal data does not overwrite a valid load reading; its absence is disclosed in settings. See [Apple’s thermal-state guide](https://developer.apple.com/library/archive/documentation/Performance/Conceptual/power_efficiency_guidelines_osx/RespondToThermalStateChanges.html).
 
 ### Disk
 
@@ -38,6 +38,10 @@ Disk reads available capacity on `/System/Volumes/Data`. Defaults:
 - Critical: **5% or less free**, or **10 GiB or less available**.
 
 Either condition triggers the corresponding status. APFS volumes share container space, so usage may differ from a Finder storage breakdown. Purgeable storage is not treated as immediately available. This key monitors space, not disk activity, SMART data, or SSD wear.
+
+### Graph history
+
+Graphs retain a rolling 5-minute window of measurements, capped at 151 samples per metric, in process memory only. The first minutes show only the portion actually collected; no earlier history is invented. Sampling pauses when keys are hidden, and missed periods or sleep are drawn as gaps. Existing recent samples survive a page change, while a plugin restart starts fresh. Unknown/stale readings hide the graph.
 
 ## Install
 
@@ -64,11 +68,11 @@ The installer and SHA-256 checksum are written to `dist/`. `build:native` compil
 
 ## Data and permissions
 
-No account, tokens, Keychain access, Full Disk Access, Accessibility permission, or network requests are required. The plugin reads aggregate operating-system counters and filesystem capacity. It does not enumerate apps, read documents, or retain resource history. See [privacy](PRIVACY.md) and [security](SECURITY.md).
+No account, tokens, Keychain access, Full Disk Access, Accessibility permission, or Internet connections are required. The plugin reads aggregate operating-system counters and filesystem capacity. It does not enumerate apps, read documents, or retain resource history on disk. See [privacy](PRIVACY.md) and [security](SECURITY.md).
 
 ## Implementation
 
-- `native/mac-health.c`: read-only Mach, sysctl, and filesystem sampler.
+- `native/mac-health.m`: read-only Mach, sysctl, filesystem, and Foundation thermal-state sampler.
 - `com.astakhoff.mac-health.sdPlugin/bin/metrics.js`: validation, averaging, thresholds, and stale handling.
 - `bin/monitor.js`: one shared helper with bounded buffering and restart backoff.
 - `bin/controller.js`: three independent action instances, their settings, and UI updates.

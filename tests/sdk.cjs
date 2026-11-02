@@ -22,6 +22,8 @@ test('official SDK receives all three actions and displays native helper measure
  emit('propertyInspectorDidAppear','memory');
  const detail=await waitFor(m=>m.event==='sendToPropertyInspector'&&m.context==='memory'&&m.payload.sample?.memory);
  assert.ok(detail.payload.sample.memory.total>0);assert.ok(detail.payload.sample.memory.used>=0);
+ assert.ok(detail.payload.sample.history.swap.length>=1);
+ assert.ok([0,1,2,3].includes(detail.payload.sample.thermal));
  for(const kind of ['memory','cpu','disk'])emit('willDisappear',kind);
  assert.equal(messages.filter(m=>m.event==='registerPlugin').length,1);
 });

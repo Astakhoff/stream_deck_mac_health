@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.0 — 2026-11-02
+
+- Replace static swap amounts and the CPU averaging label with schematic rolling 5-minute graphs.
+- Keep graphs free of axes, scale labels, legends, and extra numbers.
+- Retain only bounded recent samples in memory; show gaps after missed readings and sleep.
+- Include native macOS thermal state in CPU status color, without claiming a Celsius temperature.
+
 ## 1.1.0 — 2026-11-02
 
 - Replace Normal / Warning / Critical key labels with fixed green / yellow / red colors.

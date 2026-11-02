@@ -10,12 +10,12 @@
 
 The keys are independent. They do not alternate between metrics and there is no combined key. Add them to any existing page, or create a separate page for Mac Health.
 
-Colors are fixed: green means normal, yellow warning, and red critical. These words appear only in the settings panel; the key uses that space for larger details. CPU has configurable usage thresholds; Disk has configurable available-space percentage and GiB thresholds. Memory uses macOS pressure status rather than configurable occupied-RAM thresholds.
+Colors are fixed: green means normal, yellow warning, and red critical. These words appear only in the settings panel; Memory and CPU use that space for schematic 5-minute trend lines; Disk shows larger free-space details. CPU has configurable usage thresholds; Disk has configurable available-space percentage and GiB thresholds. Memory uses macOS pressure status rather than configurable occupied-RAM thresholds.
 
 ## Reading the keys
 
-- **Memory:** occupied-RAM estimate, macOS pressure status, and current swap allocation. High occupied RAM or swap alone does not necessarily imply critical pressure. Yellow/red pressure is a reason to inspect your workload in Activity Monitor.
-- **CPU:** overall usage, averaged over up to 10 seconds. The first reading needs a second counter sample, so CPU initially says Sampling. The bottom line shows the actual window.
+- **Memory:** occupied-RAM estimate and a schematic swap-allocation trend for the last 5 minutes. High occupied RAM or swap alone does not necessarily imply critical pressure. Yellow/red pressure is a reason to inspect your workload in Activity Monitor.
+- **CPU:** overall usage, averaged over up to 10 seconds. The first reading needs a second counter sample, so CPU initially says Sampling. The lower line graph shows raw load over the last 5 minutes. Color also reflects macOS thermal pressure, not a temperature in degrees.
 - **Disk:** percentage used and available GiB on the startup data volume. Freeing disk space and closing applications are your own actions; the plugin never does either automatically.
 
 Press Memory or CPU to open Activity Monitor. Press Disk to open Disk Utility. These launches only occur when you press a key.
@@ -38,3 +38,9 @@ The pressure sysctl is an internal macOS interface and may change. A missing pre
 ## Remove
 
 Remove Mac Health through Stream Deck's plugin management. This plugin has no login items, LaunchAgents, background service, or server-side records. The sampler runs only as a child of the plugin, and stops when no key is visible or when the plugin exits.
+
+## Schematic graphs
+
+Memory shows swap allocation; CPU shows total load. Both use a rolling 5-minute window, not all-time history. There are no printed axes, scales, legends, or extra numeric captions. Flat swap means the allocation is stable; rising swap means it is growing, while the Memory color remains tied to system pressure. Swap allocation is not swap read/write rate. Exact swap and thermal-state information remains in settings.
+
+History collects only while a Mac Health key is visible. On startup the graph begins with a real point and fills as measurements arrive. Hidden periods and sleep are gaps, not fabricated lines. Returning to a page keeps any recent samples; restarting the plugin clears history.

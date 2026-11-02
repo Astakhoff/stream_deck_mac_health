@@ -2,7 +2,7 @@
   "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
   "UUID": "com.astakhoff.mac-health",
   "Name": "Mac Health",
-  "Version": "1.1.0.0",
+  "Version": "1.2.0.0",
   "Author": "Astakhoff",
   "Description": "Separate memory pressure, CPU load, and disk-space indicators for macOS.",
   "Category": "Mac Health",
@@ -31,7 +31,7 @@
       "Controllers": [
         "Keypad"
       ],
-      "Tooltip": "RAM usage estimate, macOS memory pressure, and swap used. Press to open Activity Monitor.",
+      "Tooltip": "RAM usage, memory pressure color, and a rolling 5-minute swap trend. Press to open Activity Monitor.",
       "PropertyInspectorPath": "ui/settings.html",
       "States": [
         {
@@ -47,7 +47,7 @@
       "Controllers": [
         "Keypad"
       ],
-      "Tooltip": "Total CPU load averaged over up to 10 seconds. Press to open Activity Monitor.",
+      "Tooltip": "CPU load, a rolling 5-minute graph, and color informed by system thermal pressure. Press to open Activity Monitor.",
       "PropertyInspectorPath": "ui/settings.html",
       "States": [
         {

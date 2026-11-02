@@ -45,14 +45,21 @@ test('settings reject invalid thresholds and SVG injection; zero bar stays empty
  assert.match(svg,/&lt;CPU&gt;/);assert.doesNotMatch(svg,/<CPU>/);assert.doesNotMatch(svg,/width="0"/);
 });
 
-test('healthy, warning and critical words are replaced by fixed colors and large details',()=>{
+test('status words stay hidden with fixed colors and schematic graphs',()=>{
  const data=createAverage()(normalize(raw()));
  for(const [level,color]of [['normal','#55e58c'],['warning','#ffd45c'],['critical','#ff6b70']]){
   const v={...view('memory',data,{},null,10000),level};
   const svg=render(v,{greenColor:'#000000',yellowColor:'#000000',redColor:'#000000'});
   assert.match(svg,new RegExp(color));assert.doesNotMatch(svg,/>Normal<|>Warning<|>Critical</);
-  assert.match(svg,/>Swap</);assert.match(svg,/font-size="26"[^>]*>20 GiB</);
+  assert.doesNotMatch(svg,/>Swap<|GiB|5m|avg/);
  }
- assert.match(render(view('cpu',data,{},null,10000)),/font-size="25"[^>]*>2s avg</);
+ assert.doesNotMatch(render(view('cpu',data,{},null,10000)),/avg|2s|10s/);
  const offline=render(view('memory',data,{},'PROBE_UNAVAILABLE',10000));assert.match(offline,/>Offline</);assert.match(offline,/#91a1b9/);
+});
+
+test('CPU color incorporates actual system thermal state, never a made-up Celsius value',()=>{
+ for(const [thermal,level]of [[0,'normal'],[1,'warning'],[2,'critical'],[3,'critical'],[null,'normal']])assert.equal(classify('cpu',{cpuAverage:10,thermal}),level);
+ assert.equal(classify('cpu',{cpuAverage:null,thermal:3}),'unknown');
+ assert.equal(normalize({...raw(),thermal:2}).thermal,2);
+ assert.equal(normalize({...raw(),thermal:99}).thermal,null);
 });

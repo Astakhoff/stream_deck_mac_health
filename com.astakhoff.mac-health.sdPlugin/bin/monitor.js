@@ -3,9 +3,10 @@ const {EventEmitter}=require('node:events');
 const {spawn}=require('node:child_process');
 const path=require('node:path');
 const {normalize,createAverage}=require('./metrics');
+const {createHistory}=require('./history');
 class Monitor extends EventEmitter {
   constructor({spawnHelper=()=>spawn(path.join(__dirname,'mac-health'),[],{stdio:['ignore','pipe','ignore']}),delay=setTimeout,cancel=clearTimeout}={}) {
-    super();this.spawnHelper=spawnHelper;this.delay=delay;this.cancel=cancel;this.active=false;this.child=null;this.retry=null;this.failures=0;this.sample=null;this.error=null;
+    super();this.spawnHelper=spawnHelper;this.delay=delay;this.cancel=cancel;this.active=false;this.child=null;this.retry=null;this.failures=0;this.sample=null;this.error=null;this.history=createHistory();
   }
   start(){if(this.active)return;this.active=true;this.launch();}
   launch(){
@@ -25,7 +26,7 @@ class Monitor extends EventEmitter {
         try {
           const parsed=normalize(JSON.parse(line));
           if(!parsed)throw new Error('Invalid sample');
-          this.sample=average(parsed);this.error=null;this.failures=0;this.emit('sample',this.sample);
+          this.sample=this.history(average(parsed));this.error=null;this.failures=0;this.emit('sample',this.sample);
         }catch{this.error='INVALID_SAMPLE';this.emit('problem');}
       }
     });
