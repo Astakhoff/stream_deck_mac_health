@@ -6,7 +6,7 @@
 2. Use macOS 13 or later and Stream Deck 6.9 or later.
 3. Double-click the supplied `com.astakhoff.mac-health.streamDeckPlugin` installer.
 4. Search the actions list for **Mac Health**.
-5. Drag **Memory** onto one key, **CPU** onto another, and optionally **Disk** onto a third.
+5. Drag **Memory** onto one key, **CPU** onto another, optionally **Disk** onto a third, and **Backup** onto a fourth.
 
 The keys are independent. They do not alternate between metrics and there is no combined key. Add them to any existing page, or create a separate page for Mac Health.
 
@@ -19,6 +19,12 @@ Colors are fixed: green means normal, yellow warning, and red critical. These wo
 - **Disk:** percentage used and available GiB on the startup data volume. Freeing disk space and closing applications are your own actions; the plugin never does either automatically.
 
 Press Memory or CPU to open Activity Monitor. Press Disk to open Disk Utility. These launches only occur when you press a key.
+
+## Time Machine backup age
+
+Backup displays **Backup**, a large elapsed amount such as **25d**, and **ago**. Under one day it uses hours; from 60 days it uses approximate 30-day months (`2mo`). Green: under 7 days. Yellow: 7–29 days. Red: 30+ days. Exact completion time and the last metadata check are visible in the action settings.
+
+The latest recorded completed backup is read across configured Time Machine destinations once per minute. The backup disk may be disconnected: the plugin uses local metadata and never tries to mount it. Local APFS snapshots and attempted/failed backups are not counted. A recorded date does not verify that the backup is still available or restorable. Unknown means completion information is unavailable, not that you have never backed up. Check Time Machine settings; do not grant broad permissions just to work around missing metadata. The private preference schema can change with macOS updates. Press Backup to open System Settings; navigate to General → Time Machine.
 
 ## Troubleshooting
 

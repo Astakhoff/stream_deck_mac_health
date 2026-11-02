@@ -4,6 +4,7 @@ const palette={normal:'#55e58c',warning:'#ffd45c',critical:'#ff6b70',unknown:'#9
 const escape=(s)=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 function render(v,raw={}) {
   const color=palette[v.level]||palette.unknown;
+  if(v.title==='Backup')return `<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144"><rect width="144" height="144" rx="16" fill="#0c111d"/><g font-family="Arial,Helvetica,sans-serif" text-anchor="middle" font-weight="800"><text x="72" y="28" font-size="22" fill="${color}">Backup</text><text x="72" y="89" font-size="${v.main.length>4?35:49}" fill="#f3f8ff">${escape(v.main)}</text><text x="72" y="127" font-size="21" fill="${color}">${escape(v.detail)}</text></g></svg>`;
   const bottom=v.level==='unknown'
     ? `<text x="72" y="113" font-size="16" fill="${color}">${escape(v.label)}</text><text x="72" y="137" font-size="17" fill="#c5cfdf">${escape(v.detail)}</text>`
     : v.graph

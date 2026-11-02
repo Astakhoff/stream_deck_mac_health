@@ -3,7 +3,7 @@ const {WebSocketServer}=require('../com.astakhoff.mac-health.sdPlugin/node_modul
 const {spawn}=require('node:child_process');
 const {once}=require('node:events');
 const fs=require('node:fs/promises'),path=require('node:path'),os=require('node:os');
-test('official SDK receives all three actions and displays native helper measurements', {skip:process.platform!=='darwin',timeout:15000},async t=>{
+test('official SDK receives all four actions and displays native helper measurements', {skip:process.platform!=='darwin',timeout:15000},async t=>{
  const temp=await fs.mkdtemp(path.join(os.tmpdir(),'mac-health-sdk-'));
  const server=new WebSocketServer({host:'127.0.0.1',port:0});await once(server,'listening');let child;
  t.after(async()=>{child?.kill();for(const socket of server.clients)socket.terminate();await new Promise(r=>server.close(r));await fs.rm(temp,{recursive:true,force:true});});
@@ -14,16 +14,17 @@ test('official SDK receives all three actions and displays native helper measure
  const waitFor=async fn=>{for(let i=0;i<500;i++){const hit=messages.find(fn);if(hit)return hit;await new Promise(r=>setTimeout(r,10));}throw new Error('SDK measurement not received');};
  await waitFor(m=>m.event==='registerPlugin');
  const emit=(event,kind,payload={})=>socket.send(JSON.stringify({event,action:'com.astakhoff.mac-health.'+kind,context:kind,device:'device',payload:{controller:'Keypad',coordinates:{row:0,column:0},settings:{},...payload}}));
- for(const kind of ['memory','cpu','disk'])emit('willAppear',kind);
+ for(const kind of ['memory','cpu','disk','backup'])emit('willAppear',kind);
  const contains=(m,kind,text)=>m.event==='setImage'&&m.context===kind&&Buffer.from(m.payload.image.split(',')[1],'base64').toString().includes(text);
  await waitFor(m=>contains(m,'memory','%<'));
  await waitFor(m=>contains(m,'cpu','%<'));
  await waitFor(m=>contains(m,'disk','%<'));
+ await waitFor(m=>contains(m,'backup','Backup</text>'));
  emit('propertyInspectorDidAppear','memory');
  const detail=await waitFor(m=>m.event==='sendToPropertyInspector'&&m.context==='memory'&&m.payload.sample?.memory);
  assert.ok(detail.payload.sample.memory.total>0);assert.ok(detail.payload.sample.memory.used>=0);
  assert.ok(detail.payload.sample.history.swap.length>=1);
  assert.ok([0,1,2,3].includes(detail.payload.sample.thermal));
- for(const kind of ['memory','cpu','disk'])emit('willDisappear',kind);
+ for(const kind of ['memory','cpu','disk','backup'])emit('willDisappear',kind);
  assert.equal(messages.filter(m=>m.event==='registerPlugin').length,1);
 });

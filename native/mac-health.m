@@ -17,6 +17,29 @@ static void stop(int sig) { (void)sig; running = 0; }
 static host_cpu_load_info_data_t previous;
 static int have_previous = 0;
 
+// Time Machine metadata is private and may change. Never mount a destination,
+// enumerate backup contents, or mistake an inaccessible preference for no backup.
+static double backup_checked = 0, backup_completed = 0;
+static int backup_accessible = 0;
+static void backup_sample(double now) {
+    if (backup_checked > 0 && now >= backup_checked && now - backup_checked < 60000) return;
+    backup_checked = now; backup_completed = 0; backup_accessible = 0;
+    CFPreferencesSynchronize(CFSTR("com.apple.TimeMachine"), kCFPreferencesAnyUser, kCFPreferencesAnyHost);
+    id destinations = CFBridgingRelease(CFPreferencesCopyValue(CFSTR("Destinations"), CFSTR("com.apple.TimeMachine"), kCFPreferencesAnyUser, kCFPreferencesAnyHost));
+    if (![destinations isKindOfClass:[NSArray class]]) return;
+    backup_accessible = 1;
+    for (id destination in destinations) {
+        if (![destination isKindOfClass:[NSDictionary class]]) continue;
+        id dates = destination[@"SnapshotDates"];
+        if (![dates isKindOfClass:[NSArray class]]) continue;
+        for (id date in dates) {
+            if (![date isKindOfClass:[NSDate class]]) continue;
+            double timestamp = [date timeIntervalSince1970] * 1000.0;
+            if (timestamp > 0 && timestamp <= now && timestamp > backup_completed) backup_completed = timestamp;
+        }
+    }
+}
+
 static void sample(void) {
     mach_port_t host = mach_host_self();
     host_cpu_load_info_data_t cpu = {0};
@@ -60,12 +83,16 @@ static void sample(void) {
     int disk_ok = statfs("/System/Volumes/Data", &disk) == 0;
     struct timeval wall;
     gettimeofday(&wall, NULL);
+    backup_sample((double)wall.tv_sec * 1000.0 + wall.tv_usec / 1000.0);
     printf("{\"timestamp\":%.0f,\"cpu\":", (double)wall.tv_sec * 1000.0 + wall.tv_usec / 1000.0);
     if (usage >= 0) printf("%.3f", usage); else printf("null");
     printf(",\"thermal\":%ld", (long)NSProcessInfo.processInfo.thermalState);
     printf(",\"memory\":{\"valid\":%s,\"total\":%llu,\"used\":%llu,\"compressed\":%llu,\"pressure\":%d,\"swap\":", vm_ok && physical_ok && physical ? "true" : "false", (unsigned long long)physical, (unsigned long long)used, (unsigned long long)compressed, pressure);
     if (swap_ok) printf("%llu", (unsigned long long)swap.xsu_used); else printf("null");
-    printf("},\"disk\":{\"valid\":%s,\"total\":%llu,\"available\":%llu}}\n", disk_ok ? "true" : "false", disk_ok ? (unsigned long long)disk.f_blocks * disk.f_bsize : 0, disk_ok ? (unsigned long long)disk.f_bavail * disk.f_bsize : 0);
+    printf("},\"disk\":{\"valid\":%s,\"total\":%llu,\"available\":%llu},", disk_ok ? "true" : "false", disk_ok ? (unsigned long long)disk.f_blocks * disk.f_bsize : 0, disk_ok ? (unsigned long long)disk.f_bavail * disk.f_bsize : 0);
+    printf("\"backup\":{\"accessible\":%s,\"checkedAt\":%.0f,\"lastCompleted\":", backup_accessible ? "true" : "false", backup_checked);
+    if (backup_completed > 0) printf("%.0f", backup_completed); else printf("null");
+    printf("}}\n");
     fflush(stdout);
 }
 int main(int argc, char **argv) {

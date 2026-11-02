@@ -1,6 +1,6 @@
 # Security
 
-The sampler performs read-only Mach, sysctl, filesystem-stat, and Foundation thermal-state calls. It does not invoke a shell, request administrator access, enumerate processes, or modify memory/storage settings. Key presses launch fixed Apple bundle identifiers with `/usr/bin/open`; no user-supplied command or path is executed.
+The sampler performs read-only Mach, sysctl, filesystem-stat, and Foundation thermal-state calls, and narrowly scoped CFPreferences reads of Time Machine completion metadata. It never mounts backup destinations or reads backup contents. It does not invoke a shell, request administrator access, enumerate processes, or modify memory/storage settings. Key presses launch fixed Apple bundle identifiers with `/usr/bin/open`; no user-supplied command or path is executed.
 
 Install packaged native code only from a source you trust. Builds contain a universal, ad-hoc signed helper, not a Developer ID notarized executable. Source and build instructions are available for inspection.
 

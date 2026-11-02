@@ -1,8 +1,8 @@
 # Mac Health
 
-Three separate Stream Deck keys for macOS: **Memory**, **CPU**, and **Disk**. Add any combination; there is no combined dashboard action.
+Four separate Stream Deck keys for macOS: **Memory**, **CPU**, **Disk**, and **Backup**. Add any combination; there is no combined dashboard action.
 
-![Three independent Mac Health keys with illustrative readings](docs/mac-health-preview.png)
+![Four independent Mac Health keys with illustrative readings](docs/mac-health-preview.png)
 
 The keys help you notice resource pressure while working with many applications. They monitor your Mac locally; they do not quit apps, clear memory, change system settings, or predict every crash or freeze.
 
@@ -13,6 +13,7 @@ The keys help you notice resource pressure while working with many applications.
 | Memory | Estimated physical RAM used | macOS coarse memory-pressure level | Schematic 5-minute swap trend |
 | CPU | Average total CPU usage over up to 10 seconds | Configurable CPU thresholds | Schematic 5-minute load trend |
 | Disk | Used startup data-volume capacity | Configurable available-space thresholds | Available space in GiB |
+| Backup | Time since last known completed Time Machine backup | Age: green <7d, yellow 7–29d, red ≥30d | ago |
 
 Status words are hidden on keys: the title and bar use fixed green (normal), yellow (warning), and red (critical). Memory and CPU use the lower area for schematic rolling 5-minute graphs, without axes, scales, legends, or extra numbers. Disk retains its large available-space amount. Status text remains in action settings; unavailable readings stay explicitly marked. Each action has its own thresholds where applicable. All visible actions share one small native sampler, which reads system counters every **2 seconds**. Sampling stops when no Mac Health action is visible. Press Memory or CPU to open Activity Monitor; press Disk to open Disk Utility.
 
@@ -39,6 +40,12 @@ Disk reads available capacity on `/System/Volumes/Data`. Defaults:
 
 Either condition triggers the corresponding status. APFS volumes share container space, so usage may differ from a Finder storage breakdown. Purgeable storage is not treated as immediately available. This key monitors space, not disk activity, SMART data, or SSD wear.
 
+### Backup
+
+Shows the age of the latest known completed Time Machine backup across configured destinations. Below one day it uses hours (`12h`, or `<1h`); from 1–59 days it uses days (`25d`); from 60 days it uses approximate 30-day months (`2mo`). The footer says **ago**. Green means under 7 days, yellow 7–29 days, and red 30+ days. These age thresholds are fixed reminders, not a backup-integrity assessment. Settings show the exact local completion date and metadata check time.
+
+The native helper reads only `Destinations[].SnapshotDates` through macOS CFPreferences every minute. This local Time Machine metadata can remain available when the backup disk is disconnected. It does not mount disks, inspect backup files, run a backup, or count local snapshots as completed destination backups. It cannot verify that an old copy is still present or restorable. If the metadata is absent, unreadable, stale, or has no valid completion date, the key shows **Unknown**, rather than claiming that no backup has ever occurred. The preference schema is undocumented and may change across macOS versions. No extra permissions are requested; unavailable data should be investigated in Time Machine settings.
+
 ### Graph history
 
 Graphs retain a rolling 5-minute window of measurements, capped at 151 samples per metric, in process memory only. The first minutes show only the portion actually collected; no earlier history is invented. Sampling pauses when keys are hidden, and missed periods or sleep are drawn as gaps. Existing recent samples survive a page change, while a plugin restart starts fresh. Unknown/stale readings hide the graph.
@@ -47,7 +54,7 @@ Graphs retain a rolling 5-minute window of measurements, capped at 151 samples p
 
 Requirements: **macOS 13+**, **Stream Deck 6.9+**, and a Stream Deck keypad or compatible virtual keys. Apple Silicon and Intel are included in the same native helper. Users installing a packaged build do not need Node.js or Xcode separately; Stream Deck provides its Node runtime.
 
-For a packaged build, double-click `com.astakhoff.mac-health.streamDeckPlugin`, then find **Mac Health** in the action list. Drag **Memory**, **CPU**, and **Disk** onto three separate keys. See [installation and troubleshooting](docs/INSTALLATION.md).
+For a packaged build, double-click `com.astakhoff.mac-health.streamDeckPlugin`, then find **Mac Health** in the action list. Drag the desired actions onto separate keys, including **Backup** for Time Machine. See [installation and troubleshooting](docs/INSTALLATION.md).
 
 This project is for direct/internal use. It has **not been submitted to Elgato Marketplace**. No store publication is automated.
 
@@ -68,14 +75,14 @@ The installer and SHA-256 checksum are written to `dist/`. `build:native` compil
 
 ## Data and permissions
 
-No account, tokens, Keychain access, Full Disk Access, Accessibility permission, or Internet connections are required. The plugin reads aggregate operating-system counters and filesystem capacity. It does not enumerate apps, read documents, or retain resource history on disk. See [privacy](PRIVACY.md) and [security](SECURITY.md).
+No account, tokens, Keychain access, Full Disk Access, Accessibility permission, or Internet connections are required. The plugin reads aggregate operating-system counters, filesystem capacity, and local Time Machine completion-date metadata. It does not enumerate apps, read documents, or retain resource history on disk. See [privacy](PRIVACY.md) and [security](SECURITY.md).
 
 ## Implementation
 
 - `native/mac-health.m`: read-only Mach, sysctl, filesystem, and Foundation thermal-state sampler.
 - `com.astakhoff.mac-health.sdPlugin/bin/metrics.js`: validation, averaging, thresholds, and stale handling.
 - `bin/monitor.js`: one shared helper with bounded buffering and restart backoff.
-- `bin/controller.js`: three independent action instances, their settings, and UI updates.
+- `bin/controller.js`: four independent action instances, their settings, and UI updates.
 - `bin/plugin.mjs`: official Elgato Node SDK connection.
 
 The undocumented `kern.memorystatus_vm_pressure_level` sysctl supplies the coarse pressure state. If it is unavailable or unrecognized, Memory shows an unknown status rather than inventing a healthy one. Measurements older than 6.5 seconds are hidden and shown as Offline. A system-wide freeze can prevent the monitor from repainting; this tool cannot guarantee an advance warning.

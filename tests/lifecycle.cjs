@@ -15,17 +15,17 @@ test('helper handles chunked lines, invalid samples, retry, and cancellation',()
  m.start();children[2].stdout.emit('data',Buffer.from('{"timestamp":14000,"cpu":35}\n'));
  assert.equal(m.sample.history.cpu.length,2);assert.equal(m.sample.cpuAverage,35);m.stop();
 });
-test('three separate actions share sampling; per-key thresholds and opening behavior stay independent',async()=>{
+test('four separate actions share sampling; per-key thresholds and opening behavior stay independent',async()=>{
  const callbacks={},pictures={},opened=[];
  const sd={actions:{onWillAppear:f=>callbacks.appear=f,onWillDisappear:f=>callbacks.disappear=f,onKeyDown:f=>callbacks.key=f},settings:{onDidReceiveSettings:f=>callbacks.settings=f},ui:{onDidAppear:f=>callbacks.inspector=f,action:null,sendToPropertyInspector:()=>Promise.resolve()}};
  const m=new EventEmitter();m.active=false;m.starts=0;m.stops=0;m.start=()=>{if(!m.active){m.active=true;m.starts++;}};m.stop=()=>{m.active=false;m.stops++;};
  m.sample={timestamp:Date.now(),cpuAverage:85,cpuWindowSeconds:10,memory:{percent:95,pressure:1,swap:0},disk:{percent:92,available:40*1024**3,freePercent:8}};
  const action=(kind)=>({id:kind,manifestId:'com.astakhoff.mac-health.'+kind,setImage:image=>{pictures[kind]=Buffer.from(image.split(',')[1],'base64').toString();return Promise.resolve();},setTitle:()=>Promise.resolve(),showAlert:()=>Promise.resolve()});
  createController(sd,m,async bundle=>opened.push(bundle));
- const keys=['memory','cpu','disk'].map(action);
+ const keys=['memory','cpu','disk','backup'].map(action);
  for(const key of keys)callbacks.appear({action:key,payload:{settings:{}}});
  assert.equal(m.starts,1);assert.match(pictures.memory,/>Memory</);assert.match(pictures.memory,/#55e58c/);assert.match(pictures.cpu,/#ffd45c/);assert.match(pictures.disk,/#ffd45c/);
  callbacks.settings({action:keys[1],payload:{settings:{cpuWarning:90,cpuCritical:99}}});assert.match(pictures.cpu,/#55e58c/);assert.match(pictures.disk,/#ffd45c/);
- for(const key of keys)await callbacks.key({action:key});assert.deepEqual(opened,['com.apple.ActivityMonitor','com.apple.ActivityMonitor','com.apple.DiskUtility']);
- callbacks.disappear({action:keys[0]});callbacks.disappear({action:keys[1]});assert.equal(m.stops,0);callbacks.disappear({action:keys[2]});assert.equal(m.stops,1);
+ for(const key of keys)await callbacks.key({action:key});assert.deepEqual(opened,['com.apple.ActivityMonitor','com.apple.ActivityMonitor','com.apple.DiskUtility','com.apple.systempreferences']);
+ callbacks.disappear({action:keys[0]});callbacks.disappear({action:keys[1]});assert.equal(m.stops,0);callbacks.disappear({action:keys[2]});assert.equal(m.stops,0);callbacks.disappear({action:keys[3]});assert.equal(m.stops,1);
 });

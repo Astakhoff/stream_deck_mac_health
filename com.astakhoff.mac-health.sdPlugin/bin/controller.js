@@ -14,7 +14,7 @@ function createController(sd,monitor,openApp){
   }
   function paintAll(){for(const record of actions.values())paint(record);}
   const appear=(ev)=>{
-    const type=kind(ev);if(!['memory','cpu','disk'].includes(type))return;
+    const type=kind(ev);if(!['memory','cpu','disk','backup'].includes(type))return;
     const record={action:ev.action,type,config:settings(ev.payload?.settings)};
     actions.set(ev.action.id,record);paint(record);monitor.start();
   };
@@ -24,7 +24,7 @@ function createController(sd,monitor,openApp){
   sd.ui.onDidAppear(ev=>{const r=actions.get(ev.action.id);if(r)paint(r);});
   sd.actions.onKeyDown(async ev=>{
     const r=actions.get(ev.action.id);if(!r)return;
-    try{await openApp(r.type==='disk'?'com.apple.DiskUtility':'com.apple.ActivityMonitor');}
+    try{await openApp(r.type==='backup'?'com.apple.systempreferences':r.type==='disk'?'com.apple.DiskUtility':'com.apple.ActivityMonitor');}
     catch{await Promise.resolve(ev.action.showAlert()).catch(()=>{});}
   });
   monitor.on('sample',paintAll);monitor.on('problem',paintAll);

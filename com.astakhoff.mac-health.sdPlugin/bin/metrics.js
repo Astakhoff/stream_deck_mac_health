@@ -15,7 +15,7 @@ function normalize(raw) {
   const memory=raw.memory, disk=raw.disk;
   const memoryValid=memory?.valid===true && finite(memory.total) && memory.total>0 && finite(memory.used) && memory.used>=0 && memory.used<=memory.total;
   const diskValid=disk?.valid===true && finite(disk.total) && disk.total>0 && finite(disk.available) && disk.available>=0 && disk.available<=disk.total;
-  return {timestamp:raw.timestamp,thermal:Number.isInteger(raw.thermal)&&raw.thermal>=0&&raw.thermal<=3?raw.thermal:null,cpu:finite(raw.cpu)&&raw.cpu>=0&&raw.cpu<=100?raw.cpu:null,
+  return {timestamp:raw.timestamp,backup:raw.backup?.accessible===true&&finite(raw.backup.checkedAt)?{checkedAt:raw.backup.checkedAt,lastCompleted:finite(raw.backup.lastCompleted)&&raw.backup.lastCompleted>0?raw.backup.lastCompleted:null}:null,thermal:Number.isInteger(raw.thermal)&&raw.thermal>=0&&raw.thermal<=3?raw.thermal:null,cpu:finite(raw.cpu)&&raw.cpu>=0&&raw.cpu<=100?raw.cpu:null,
     memory:memoryValid?{total:memory.total,used:memory.used,percent:100*memory.used/memory.total,pressure:[1,2,3,4].includes(memory.pressure)?memory.pressure:null,compressed:finite(memory.compressed)&&memory.compressed>=0?memory.compressed:null,swap:finite(memory.swap)&&memory.swap>=0?memory.swap:null}:null,
     disk:diskValid?{total:disk.total,available:disk.available,freePercent:100*disk.available/disk.total,percent:100*(1-disk.available/disk.total)}:null};
 }
@@ -52,6 +52,7 @@ function classify(kind,data,config={}) {
 }
 const gib=(n)=>finite(n)?(n/GIB).toFixed(n/GIB<10?1:0)+' GiB':'Unknown';
 function view(kind,data,config={},error=null,now=Date.now()) {
+  if(kind==='backup') return require('./backup').backupView(data,error,now);
   if(!data || error || now-data.timestamp>6500 || data.timestamp>now+5000) return {title:kind==='cpu'?'CPU':kind==='disk'?'Disk':'Memory',main:'—',label:data?'Offline':'Waiting',detail:'Open settings',percent:null,level:'unknown'};
   const level=classify(kind,data,config), label={normal:'Normal',warning:'Warning',critical:'Critical',unknown:'Unknown'}[level];
   if(kind==='memory') return {title:'Memory',main:data.memory?Math.round(data.memory.percent)+'%':'—',label,detail:data.memory?.swap!==null&&data.memory? 'Swap '+gib(data.memory.swap):'Swap unknown',graph:{points:data.history?.swap||[],windowEnd:data.timestamp,minSpan:256*1024**2},percent:data.memory?.percent??null,level};

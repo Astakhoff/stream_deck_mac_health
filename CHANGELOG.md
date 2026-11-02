@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.3.0 — 2026-11-02
+
+- Add a separate Time Machine Backup action with a large elapsed age and an ago footer.
+- Read local completion metadata every minute without mounting disconnected destinations.
+- Use fixed green/yellow/red age thresholds and explicit Unknown for unavailable dates.
+- Keep exact completion and metadata-check timestamps in settings.
+
 ## 1.2.0 — 2026-11-02
 
 - Replace static swap amounts and the CPU averaging label with schematic rolling 5-minute graphs.

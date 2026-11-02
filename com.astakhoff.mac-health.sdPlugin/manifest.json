@@ -2,9 +2,9 @@
   "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
   "UUID": "com.astakhoff.mac-health",
   "Name": "Mac Health",
-  "Version": "1.2.0.0",
+  "Version": "1.3.0.0",
   "Author": "Astakhoff",
-  "Description": "Separate memory pressure, CPU load, and disk-space indicators for macOS.",
+  "Description": "Separate memory, CPU, disk-space, and Time Machine backup-age indicators for macOS.",
   "Category": "Mac Health",
   "CategoryIcon": "imgs/category",
   "Icon": "imgs/plugin",
@@ -68,6 +68,22 @@
       "States": [
         {
           "Image": "imgs/disk-key",
+          "ShowTitle": false
+        }
+      ]
+    },
+    {
+      "UUID": "com.astakhoff.mac-health.backup",
+      "Name": "Backup",
+      "Icon": "imgs/backup-action",
+      "Controllers": [
+        "Keypad"
+      ],
+      "Tooltip": "Age of the latest known completed Time Machine backup, including disconnected destinations. Press to open System Settings.",
+      "PropertyInspectorPath": "ui/settings.html",
+      "States": [
+        {
+          "Image": "imgs/backup-key",
           "ShowTitle": false
         }
       ]
