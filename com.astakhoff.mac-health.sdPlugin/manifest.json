@@ -2,7 +2,7 @@
   "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
   "UUID": "com.astakhoff.mac-health",
   "Name": "Mac Health",
-  "Version": "1.0.0.0",
+  "Version": "1.1.0.0",
   "Author": "Astakhoff",
   "Description": "Separate memory pressure, CPU load, and disk-space indicators for macOS.",
   "Category": "Mac Health",

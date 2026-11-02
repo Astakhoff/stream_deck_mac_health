@@ -10,7 +10,7 @@
 
 The keys are independent. They do not alternate between metrics and there is no combined key. Add them to any existing page, or create a separate page for Mac Health.
 
-Select a key to customize its three colors. CPU has usage thresholds; Disk has available-space percentage and GiB thresholds. Memory uses macOS pressure status rather than configurable occupied-RAM thresholds.
+Colors are fixed: green means normal, yellow warning, and red critical. These words appear only in the settings panel; the key uses that space for larger details. CPU has configurable usage thresholds; Disk has configurable available-space percentage and GiB thresholds. Memory uses macOS pressure status rather than configurable occupied-RAM thresholds.
 
 ## Reading the keys
 

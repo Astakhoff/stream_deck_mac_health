@@ -40,7 +40,19 @@ test('stale, helper failure and future timestamps hide old numbers',()=>{
 });
 test('settings reject invalid thresholds and SVG injection; zero bar stays empty',()=>{
  const s=settings({greenColor:'"/><script>',cpuWarning:99,cpuCritical:40,diskWarning:1,diskCritical:2});
- assert.equal(s.greenColor,'#55e58c');assert.equal(s.cpuWarning,80);assert.equal(s.diskWarning,10);
+ assert.equal(s.greenColor,undefined);assert.equal(s.cpuWarning,80);assert.equal(s.diskWarning,10);
  const svg=render({title:'<CPU>',main:'0%',label:'Normal',detail:'0s',percent:0,level:'normal'});
  assert.match(svg,/&lt;CPU&gt;/);assert.doesNotMatch(svg,/<CPU>/);assert.doesNotMatch(svg,/width="0"/);
+});
+
+test('healthy, warning and critical words are replaced by fixed colors and large details',()=>{
+ const data=createAverage()(normalize(raw()));
+ for(const [level,color]of [['normal','#55e58c'],['warning','#ffd45c'],['critical','#ff6b70']]){
+  const v={...view('memory',data,{},null,10000),level};
+  const svg=render(v,{greenColor:'#000000',yellowColor:'#000000',redColor:'#000000'});
+  assert.match(svg,new RegExp(color));assert.doesNotMatch(svg,/>Normal<|>Warning<|>Critical</);
+  assert.match(svg,/>Swap</);assert.match(svg,/font-size="26"[^>]*>20 GiB</);
+ }
+ assert.match(render(view('cpu',data,{},null,10000)),/font-size="25"[^>]*>2s avg</);
+ const offline=render(view('memory',data,{},'PROBE_UNAVAILABLE',10000));assert.match(offline,/>Offline</);assert.match(offline,/#91a1b9/);
 });

@@ -22,8 +22,8 @@ test('three separate actions share sampling; per-key thresholds and opening beha
  createController(sd,m,async bundle=>opened.push(bundle));
  const keys=['memory','cpu','disk'].map(action);
  for(const key of keys)callbacks.appear({action:key,payload:{settings:{}}});
- assert.equal(m.starts,1);assert.match(pictures.memory,/>Memory</);assert.match(pictures.memory,/>Normal</);assert.match(pictures.cpu,/>Warning</);assert.match(pictures.disk,/>Warning</);
- callbacks.settings({action:keys[1],payload:{settings:{cpuWarning:90,cpuCritical:99}}});assert.match(pictures.cpu,/>Normal</);assert.match(pictures.disk,/>Warning</);
+ assert.equal(m.starts,1);assert.match(pictures.memory,/>Memory</);assert.match(pictures.memory,/#55e58c/);assert.match(pictures.cpu,/#ffd45c/);assert.match(pictures.disk,/#ffd45c/);
+ callbacks.settings({action:keys[1],payload:{settings:{cpuWarning:90,cpuCritical:99}}});assert.match(pictures.cpu,/#55e58c/);assert.match(pictures.disk,/#ffd45c/);
  for(const key of keys)await callbacks.key({action:key});assert.deepEqual(opened,['com.apple.ActivityMonitor','com.apple.ActivityMonitor','com.apple.DiskUtility']);
  callbacks.disappear({action:keys[0]});callbacks.disappear({action:keys[1]});assert.equal(m.stops,0);callbacks.disappear({action:keys[2]});assert.equal(m.stops,1);
 });

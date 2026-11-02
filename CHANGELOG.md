@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0 — 2026-11-02
+
+- Replace Normal / Warning / Critical key labels with fixed green / yellow / red colors.
+- Enlarge swap, free-space, and CPU-window details using the available lower area.
+- Keep unavailable-state labels and detailed status in action settings.
+
 ## 1.0.0 — 2026-11-02
 
 - Add separate Memory, CPU, and Disk actions for macOS.

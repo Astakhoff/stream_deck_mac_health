@@ -14,7 +14,7 @@ The keys help you notice resource pressure while working with many applications.
 | CPU | Average total CPU usage over up to 10 seconds | Configurable CPU thresholds | Actual averaging window |
 | Disk | Used startup data-volume capacity | Configurable available-space thresholds | Available space in GiB |
 
-Each action has its own settings. All visible actions share one small native sampler, which reads system counters every **2 seconds**. Sampling stops when no Mac Health action is visible. Press Memory or CPU to open Activity Monitor; press Disk to open Disk Utility.
+Status words are hidden on keys: the title and bar use fixed green (normal), yellow (warning), and red (critical). Swap and free-space amounts use the enlarged lower area. Status text remains in action settings; unavailable readings stay explicitly marked. Each action has its own thresholds where applicable. All visible actions share one small native sampler, which reads system counters every **2 seconds**. Sampling stops when no Mac Health action is visible. Press Memory or CPU to open Activity Monitor; press Disk to open Disk Utility.
 
 ### Memory
 
